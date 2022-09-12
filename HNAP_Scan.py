@@ -36,8 +36,9 @@ def banner():
 {white}         \   _-'                                                                `-_   /  {reset}
 {white}          `''                                                                      ``'   {reset}
 {white}================================================================================================================{reset}
-{white}        |{green}OPEN-SOURCE PROJECT | https://github.com/PadawanJB/codes/blob/main/HNAP_Scan.py{white}|          {reset}
-{white}        |{green}By PadawanJB                                                                   {white}|{reset}
+{white}        |{green}OPEN-SOURCE PROJECT | https://github.com/PadawanJB/publicos/blob/main/HNAP_Scan.py{white}|               {reset}
+{white}        |{green}By PadawanJB                                                                      {white}|               {reset}
+{white}        |{red}Não utilize dois parametros ao mesmo tempo, isto resultará em mal funcionamento   {white}|         {white}
 {white}================================================================================================================{reset}
 """.format(red=Fore.RED,yellow=Fore.YELLOW,green=Fore.GREEN,blue=Fore.BLUE,pink=Fore.MAGENTA,white=Fore.WHITE,reset=Style.RESET_ALL,bright=Style.BRIGHT))
 
@@ -223,7 +224,7 @@ def limpartela():
 
 ######## Inicio do código ########
 
-#os.system("clear")
+os.system("clear")
 banner()
 
 with tqdm(total=ipcar) as barra_progresso:
