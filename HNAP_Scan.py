@@ -6,6 +6,7 @@ import sys
 import colorama #Para instalar o Colorama: pip install colorama
 from colorama import Fore,Back,Style
 from tqdm import tqdm ##Para instalar o Colorama: pip install tqdm
+import argparse
 
 import logging
 import threading
@@ -35,8 +36,8 @@ def banner():
 {white}         \   _-'                                                                `-_   /  {reset}
 {white}          `''                                                                      ``'   {reset}
 {white}================================================================================================================{reset}
-{white}        |{green}OPEN-SOURCE PROJECT | https://github.com/PadawanJB/publicos/blob/main/HNAP_Scan.py{white}|          {reset}
-{white}        |{green}By PadawanJB                                                                      {white}|{reset}
+{white}        |{green}OPEN-SOURCE PROJECT | https://github.com/PadawanJB/codes/blob/main/HNAP_Scan.py{white}|          {reset}
+{white}        |{green}By PadawanJB                                                                   {white}|{reset}
 {white}================================================================================================================{reset}
 """.format(red=Fore.RED,yellow=Fore.YELLOW,green=Fore.GREEN,blue=Fore.BLUE,pink=Fore.MAGENTA,white=Fore.WHITE,reset=Style.RESET_ALL,bright=Style.BRIGHT))
 
@@ -53,7 +54,35 @@ hnaplist = []
 
 #_#_#_#_ Definição de argumentos #_#_#_#_
 
-arg1 = sys.argv[1]
+#arg1 = sys.argv[1]
+parser = argparse.ArgumentParser(description='Efetua um scan HTTP, os hosts que obtiverem acesso HTTP são então adicionados em uma lista de acesso HNAP para que seja efetuada a execução do exploit.', exit_on_error=False)
+
+parser.add_argument('-8', '--pri8', action='store_true', help='Use -8 para a faixa de IP privado 10.0.0.0/8.')
+parser.add_argument('-12', '--pri12', action='store_true', help='Use -12 para a faixa de IP privado 172.16.0.0/12.')
+parser.add_argument('-16', '--pri16', action='store_true', help='Use -16 para a faixa de IP privado 192.168.0.0/16.')
+parser.add_argument('-t', '--teste', action='store_true',help='Efetua o teste em um IP especifico.')
+
+try:
+        args = parser.parse_args()
+        pass
+except argparse.ArgumentError:
+        print('Digite "-h" ou "--help" para verificar às opções disponives.')
+#       print("Argumento inváido.")
+#       exit()
+#else:
+#       exit()
+
+if args.pri8 == True:
+        arg1 = "-8"
+elif args.pri12 == True:
+        arg1 = "-12"
+elif args.pri16 == True:
+        arg1 = "-16"
+elif args.teste == True:
+        arg1 = "-t"
+else:
+        print("Sainda errada")
+        exit()
 
 ######## Definindo variaveis ########
 
@@ -71,30 +100,6 @@ if arg1 == "-8" or arg1== "-12" or arg1 == "-16":
         portcar = 45 #Padrão=45
 elif arg1 == "-t":
         portcar = 1
-
-######## Argumentos de execução do código ########
-
-#_#_#_#_ Definição de argumentos #_#_#_#_ 
-
-#arg1 = sys.argv[1]
-
-#_#_#_#_ Executando a verificação do argumento #_#_#_#_
-
-if arg1 == "-8" or arg1 == "-12" or arg1 == "-16" or arg1 == "-t":
-        pass
-elif arg1 == "-h" or arg1 == "--help": 
-        print("Use -8 para a faixa de IP privado 10.0.0.0/8.")
-        print("Use -12 para a faixa de IP privado 172.16.0.0/12.")
-        print("Use -16 para a faixa de IP privado 192.168.0.0/16.")
-        exit()
-elif arg1 != "-8" or arg1 != "-12" or arg1 != "-16" or arg1 != "-h" or arg1 != "--help":
-        print("Argumento inválido.")
-        print('Digite "-h" ou "--help" para verificar às opções disponives.')
-        exit()
-else:
-        print("Argumento inváido.")
-        print('Digite "-h" ou "--help" para verificar às opções disponives.')
-        exit()
 
 ######## Criando modulos ########
 
@@ -132,11 +137,11 @@ def iptocheck():
 
 def testehttp():
         def funcao_thread(porttest):
-                ip_to_check = iptocheck
+                ip_to_check = iptocheck()
                 for lineport in range(len(port)):
                         porttest = port[lineport]
                         ipport_to_check = f"{ip_to_check}{porttest}"
-#                       tqdm.write(f"Testanto {ipport_to_check}.", end="\n", nolock=False)
+#                       print(ipport_to_check)
 #                       IP.append("google.com") #Adiciona o Google a lista de teste HTTP para efetuar o teste em redes onde o acesso HTTP é bloqueado.
                         url = "http://exemple.com"
                         headers = {'Host': f'{ipport_to_check}'}
@@ -218,7 +223,7 @@ def limpartela():
 
 ######## Inicio do código ########
 
-os.system("clear")
+#os.system("clear")
 banner()
 
 with tqdm(total=ipcar) as barra_progresso:
