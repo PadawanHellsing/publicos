@@ -122,7 +122,7 @@ def iptocheck():
                         pass
 
         if arg1 == "-12":
-                for lineip in IP1:
+                for lineip in IP12:
                         lineip = lineip.strip()
                         ip_to_check = f"http://{lineip}:"
                         return ip_to_check
