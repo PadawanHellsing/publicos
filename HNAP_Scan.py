@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import sys
 import requests
 import os
@@ -5,10 +7,10 @@ import survey   #Para instalar o Survey: pip install survey
 import sys
 import colorama #Para instalar o Colorama: pip install colorama
 from colorama import Fore,Back,Style
-from tqdm import tqdm ##Para instalar o Colorama: pip install tqdm
+from tqdm import tqdm ##Para instalar o tqdm: pip install tqdm
 import argparse
-
 import logging
+
 import threading
 import time
 
@@ -44,10 +46,11 @@ def banner():
 
 ######## Definindo wordlists ########
 
-IP8 = open('wordlist/SecLists/Discovery/Infrastructure/All-Ipv4-ClassA-10.10.txt')
-IP12 = open('wordlist/SecLists/Discovery/Infrastructure/All-Ipv4-ClassB-172.16.txt')
-IP16 = open('wordlist/SecLists/Discovery/Infrastructure/All-Ipv4-ClassC-192.168.txt')
-IP1 = ["192.168.0.108"]
+IP8 = open('/home/kali/tools/Wordlist/All-Ipv4-ClassA-10.10.txt')
+IP12 = open('/home/kali/tools/Wordlist/All-Ipv4-ClassB-172.16.txt')
+IP10 = open('/home/kali/tools/Wordlist/All-Ipv4-CGNAT-100.64.txt')
+IP16 = open('/home/kali/tools/Wordlist/All-Ipv4-ClassC-192.168.txt')
+IP1 = ["177.131.11.217"]
 port = ["66", "80", "81", "443", "445", "457", "1080", "1100", "1241", "1352", "1433", "1434", "1521", "1944", "2301", "3000", "3128", "3306", "4000", "4001", "4002", "4100", "5000", "5432", "5800", "5801", "5802", "6346", "6347", "7001", "7002", "8080", "8081", "8082", "8083", "8084", "8085", "8086", "8087", "8088", "8089", "8090", "8443", "8888", "30821"]
 #port = open('wordlist/common-http-ports-copia.txt')
 httplist = []
@@ -59,9 +62,10 @@ hnaplist = []
 parser = argparse.ArgumentParser(description='Efetua um scan HTTP, os hosts que obtiverem acesso HTTP são então adicionados em uma lista de acesso HNAP para que seja efetuada a execução do exploit.', exit_on_error=False)
 
 parser.add_argument('-8', '--pri8', action='store_true', help='Use -8 para a faixa de IP privado 10.0.0.0/8.')
+parser.add_argument('-10', '--cgnat', action='store_true', help='Use -10 para a faixa de IP privado 100.64.0.0/10.')
 parser.add_argument('-12', '--pri12', action='store_true', help='Use -12 para a faixa de IP privado 172.16.0.0/12.')
 parser.add_argument('-16', '--pri16', action='store_true', help='Use -16 para a faixa de IP privado 192.168.0.0/16.')
-parser.add_argument('-t', '--teste', action='store_true',help='Efetua o teste em um IP especifico.')
+parser.add_argument('-t', '--teste', action='store_true', help='Efetua o teste em um IP especifico.')
 
 try:
         args = parser.parse_args()
@@ -75,6 +79,8 @@ except argparse.ArgumentError:
 
 if args.pri8 == True:
         arg1 = "-8"
+elif args.cgnat == True:
+        arg1 = "-10"
 elif args.pri12 == True:
         arg1 = "-12"
 elif args.pri16 == True:
@@ -82,7 +88,7 @@ elif args.pri16 == True:
 elif args.teste == True:
         arg1 = "-t"
 else:
-        print("Sainda errada")
+        print('Digite "-h" ou "--help" para verificar às opções disponives.')
         exit()
 
 ######## Definindo variaveis ########
@@ -92,15 +98,22 @@ ipnum = 0
 
 if arg1 == "-8" or arg1 == "-16":
         ipcar = 64770 #Padrão=64770
+elif arg1 == "-10":
+        ipcar = 4226880 #Padrão=4226880
 elif arg1 == "-12":
         ipcar = 1105680 #Padrão=1105680
 elif arg1 == "-t":
         ipcar = 1
 
-if arg1 == "-8" or arg1== "-12" or arg1 == "-16":
+if arg1 == "-8" or arg1 == "-10" or arg1== "-12" or arg1 == "-16":
         portcar = 45 #Padrão=45
 elif arg1 == "-t":
         portcar = 1
+
+######## Definindo formato de log ########
+
+log_format = '%(asctime)s:%(message)s'
+logging.basicConfig(format=log_format, level=logging.INFO)
 
 ######## Criando modulos ########
 
@@ -108,7 +121,15 @@ def iptocheck():
         if arg1 == "-8":
                 for lineip in IP8:
                         lineip = lineip.strip()
-                        ip_to_check = f"http://{lineip}:"
+                        ip_to_check = f"http://{lineip}"
+                        return ip_to_check
+                else:
+                        pass
+
+        if arg1 == "-10":
+                for lineip in IP10:
+                        lineip = lineip.strip()
+                        ip_to_check = f"http://{lineip}"
                         return ip_to_check
                 else:
                         pass
@@ -116,7 +137,7 @@ def iptocheck():
         if arg1 == "-16":
                 for lineip in IP16:
                         lineip = lineip.strip()
-                        ip_to_check = f"http://{lineip}:"
+                        ip_to_check = f"http://{lineip}"
                         return ip_to_check
                 else:
                         pass
@@ -124,14 +145,15 @@ def iptocheck():
         if arg1 == "-12":
                 for lineip in IP12:
                         lineip = lineip.strip()
-                        ip_to_check = f"http://{lineip}:"
+                        ip_to_check = f"http://{lineip}"
                         return ip_to_check
                 else:
                         pass
+
         if arg1 == "-t":
                 for lineip in IP1:
                         lineip = lineip.strip()
-                        ip_to_check = f"http://{lineip}:"
+                        ip_to_check = f"http://{lineip}"
                         return ip_to_check
                 else:
                         pass
@@ -139,14 +161,19 @@ def iptocheck():
 def testehttp():
         def funcao_thread(porttest):
                 ip_to_check = iptocheck()
+                logging.info(f"Testanto {ip_to_check}.\r")
                 for lineport in range(len(port)):
                         porttest = port[lineport]
-                        ipport_to_check = f"{ip_to_check}{porttest}"
-#                       print(ipport_to_check)
+                        ipport_to_check = f"{ip_to_check}:{porttest}"
+#                       tqdm.write(f"Testanto {ipport_to_check}.", end="\n", nolock=False)
+#                       msg = tqdm.write(f"Testanto {ipport_to_check}.", end="\n", nolock=False)
+#                       logging.info(f"{msg}")
 #                       IP.append("google.com") #Adiciona o Google a lista de teste HTTP para efetuar o teste em redes onde o acesso HTTP é bloqueado.
-                        url = "http://exemple.com"
-                        headers = {'Host': f'{ipport_to_check}'}
-                        r = requests.get(f"{url}", allow_redirects=True, headers=headers)
+                        try:
+                                r = requests.get(f"{ipport_to_check}", timeout=2)
+                                break
+                        except:
+                                continue
                         if (r.status_code == 200 or r.status_code == 301):
 #                       if (r.status_code == 400):
                                 tqdm.write(f"Sucesso ao acessar {ipport_to_check}, status code: {r.status_code}", end="\n", nolock=False)
@@ -221,17 +248,18 @@ def exploitnhap():
 
 def limpartela():
         os.system("clear")
+        banner()
 
 ######## Inicio do código ########
 
-os.system("clear")
-banner()
+limpartela()
 
-with tqdm(total=ipcar) as barra_progresso:
+with tqdm(total=ipcar, position=0, leave=True) as barra_progresso:
 #       tqdm.set_lock(lock)
         if (ipnum/64770) <= 1:
                 while(ipnum <= ipcar):
                         if(portnun <= portcar):
+                                limpartela()
                                 barra_progresso.update(4)
                                 ipnum = ipnum+4
                                 testehttp()
