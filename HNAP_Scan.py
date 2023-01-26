@@ -55,10 +55,10 @@ hnaplist = []
 
 #_#_#_#_ Definição de argumentos #_#_#_#_
 
-parser = argparse.ArgumentParser(prog='HNAP_Scan', description='Efetua um scan HTTP, os hosts que obtiverem acesso HTTP são então adicionados em uma lista de acesso HNAP para que seja efetuado o teste do exploit.', exit_on_error=False)
+parser = argparse.ArgumentParser(prog='HNAP_Scan', description='Efetua um scan HTTP, os hosts que obtiverem acesso HTTP são então adicionados em uma lista de acesso HNAP para ser efetuado o teste do exploit.', exit_on_error=False)
 
 ipnetworks = parser.add_argument_group('Redes de IP', 'Defina em qual faixa de IP privado fará os testes.')
-execdef = parser.add_argument_group('Definições de execução', 'Defina parametros de execução opcionais.')
+execdef = parser.add_argument_group('Definições de execução', 'Defina parâmetros de execução opcionais.')
 
 try:
         class VAction(argparse.Action):
@@ -81,14 +81,14 @@ ipnetworks.add_argument('-8', '--pri8', action='store_true', help='Use -8 para a
 ipnetworks.add_argument('-10', '--cgnat', action='store_true', help='Use -10 para a faixa de IP privado 100.64.0.0/10.')
 ipnetworks.add_argument('-12', '--pri12', action='store_true', help='Use -12 para a faixa de IP privado 172.16.0.0/12.')
 ipnetworks.add_argument('-16', '--pri16', action='store_true', help='Use -16 para a faixa de IP privado 192.168.0.0/16.')
-ipnetworks.add_argument('-t', '--teste', action='store_true', help='Efetua o teste em um IP especifico.')
+ipnetworks.add_argument('-t', '--teste', action='store_true', help='Efetua o teste em uma rede específica.')
 
 helptext = """Níveis do verbose:
         0 = Não mostra nenhuma informação de log, somente barra de progresso.
         1 = Mostra logs de sucesso em ações e barra de progresso.
         2 = Mostra os logs de teste, sucesso e barra de progresso."""
 
-execdef.add_argument('-v', '--verbose', action=VAction, const= 1, help=helptext)
+execdef.add_argument('-v', '--verbose', action=VAction, const=1, help=helptext, default=0)
 
 args = parser.parse_args()
 for c in [args.verbose]:
@@ -151,7 +151,7 @@ else:
 
 ######## Definindo quantidade de threads ########
 
-threads = int(6)
+#threads = int(6)
 
 ######## Definindo variaveis ########
 
