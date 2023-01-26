@@ -7,7 +7,7 @@ def main():
   parser.add_argument("-o", "--output", help="Nome do arquivo final", default="IPList.txt")
   parser.add_argument("-r", "--range", help="Digite o IP e a rede que deseja utilizar (Formato: 192.168.0.0/24): ")
   args = parser.parse_args()
-  generateRange(args.output, args.range) if args.range else print("Deve ser preenchido um range no formato xxx.xxx.xxx.xxx/xx")
+  generateRange(args.output, args.range) if args.range else print("Digite -h para ver as opcoes disponiveis.")
 
 def generateRange(filename, range):
   with open(filename, "w") as f: 
