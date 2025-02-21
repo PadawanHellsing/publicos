@@ -18,7 +18,6 @@ do
   echo " Total OPEN 1 = $portas_open1"
   echo " Total OPEN 2 = $portas_open2"
   echo "-----------------------------" 
-#  echo "[?] Verificando se houve difernen  a entre as duas saidas acima."
  done
 done
 
